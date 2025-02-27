@@ -1,0 +1,52 @@
+class Options(SubscriptableBaseModel):
+  # load time options
+  numa: Optional[bool] = None
+  num_ctx: Optional[int] = None
+  num_batch: Optional[int] = None
+  num_gpu: Optional[int] = None
+  main_gpu: Optional[int] = None
+  low_vram: Optional[bool] = None
+  f16_kv: Optional[bool] = None
+  logits_all: Optional[bool] = None
+  vocab_only: Optional[bool] = None
+  use_mmap: Optional[bool] = None
+  use_mlock: Optional[bool] = None
+  embedding_only: Optional[bool] = None
+  num_thread: Optional[int] = None
+
+  # runtime options
+  num_keep: Optional[int] = None
+  seed: Optional[int] = None
+  num_predict: Optional[int] = None
+  top_k: Optional[int] = None
+  top_p: Optional[float] = None
+  tfs_z: Optional[float] = None
+  typical_p: Optional[float] = None
+  repeat_last_n: Optional[int] = None
+  temperature: Optional[float] = None
+  repeat_penalty: Optional[float] = None
+  presence_penalty: Optional[float] = None
+  frequency_penalty: Optional[float] = None
+  mirostat: Optional[int] = None
+  mirostat_tau: Optional[float] = None
+  mirostat_eta: Optional[float] = None
+  penalize_newline: Optional[bool] = None
+  stop: Optional[Sequence[str]] = None
+
+# Задаются как словарь
+gen = ollama.generate(..., options={"temperature":0.5, ...})
+
+# Описание параметров
+1. mirostat (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0) - Включает выборку Mirostat для контроля за путаницей. - Особый алгоритм декодирования текста top-k на основе обратной связи, который генерирует текст (любой длины) с предопределенным значением перплексии, таким образом, высококачественный текст без какой либо надстройки.
+2. mirostat_eta (default: 0.1) - Влияет на то, как быстро алгоритм реагирует на обратную связь от сгенерированного текста. Более низкая скорость обучения приведет к более медленным корректировкам, в то время как более высокая скорость обучения сделает алгоритм более отзывчивым.
+3. mirostat_tau (default: 5.0) - Управляет балансом между связностью и разнообразием вывода. Более низкое значение приведет к более целенаправленному и связному тексту.
+4. num_ctx (default: 2048) - Устанавливает размер контекстного окна, используемого для генерации следующего токена.
+5. repeat_last_n (default: 64, 0 = disabled, -1 = num_ctx) - Устанавливает, насколько далеко назад должна заглядывать модель, чтобы избежать повторений.
+6. repeat_penalty (default: 1.1) - Устанавливает, насколько сильно штрафовать за повторения. Более высокое значение (например, 1,5) будет штрафовать за повторения сильнее, а более низкое значение (например, 0,9) будет более снисходительным.
+7. temperature (default: 0.8) - Температура модели. Повышение температуры заставит модель реагировать более креативно.
+8. seed (default: 0) - Устанавливает случайное числовое семя для генерации. Установка этого числа на определенное число заставит модель генерировать тот же текст для того же вызова.
+9. stop (string) - Устанавливает последовательности остановок для использования. При обнаружении этого шаблона LLM прекратит генерацию текста и вернется. Можно задать несколько шаблонов остановок, указав несколько отдельных параметров остановок в файле модели.
+10. num_predict (default: -1, infinite generation) - Максимальное количество токенов для прогнозирования при генерации текста.
+11. top_k (default: 40) - Снижает вероятность генерации бессмыслицы. Более высокое значение (например, 100) даст более разнообразные ответы, тогда как более низкое значение (например, 10) будет более консервативным.
+12. top_p (default: 0.9) - Работает вместе с top-k. Более высокое значение (например, 0,95) приведет к более разнообразному тексту, тогда как более низкое значение (например, 0,5) будет генерировать более сфокусированный и консервативный текст.
+13. min_p (default: 0.0) - Альтернатива top_p, направленная на обеспечение баланса качества и разнообразия. Параметр p представляет собой минимальную вероятность того, что токен будет рассмотрен, относительно вероятности наиболее вероятного токена. Например, при p=0,05 и наиболее вероятном токене с вероятностью 0,9, логиты со значением менее 0,045 отфильтровываются.
